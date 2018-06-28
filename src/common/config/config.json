@@ -1,0 +1,160 @@
+{
+  "defaultPricePrecision": 8,
+  "defaultVolumePrecision": 8,
+  "defaultLrcFeePermillage": 2,
+  "defaultGasPrice": 21,
+  "defaultMarginSplitPercentage": 50,
+  "defaultGasLimit": "0x30d40",
+  "defaultExpireTime": 1,
+  "defaultExpireTimeUnit": "day",
+  "delegateAddress": "0x17233e07c67d086464fD408148c3ABB56245FA64",
+  "batchAddress": "0xce41fc6412CC87b1b53B7A7D8beD2C8F8bb33c9A",
+  "chainId": 4,
+  "bindContractAddress": "0xbf78B6E180ba2d1404c92Fc546cbc9233f616C42",
+  "minimumLrcfeeInEth":0.00045,
+  "demoAccount":"0xeba7136a36da0f5e16c6bdbc739c716bb5b65a00",
+  "localStorageVersion":201805072310,
+  "walletAddress":"0xb94065482ad64d4c2b9252358d746b39e820a582",
+  "contracts": [
+    {
+      "address": "0x8d8812b72d1e4ffCeC158D25f56748b7d67c1e78",
+      "version": "v1.5.1"
+    }
+  ],
+  "langs": [
+    {
+      "value": "en",
+      "label": "English"
+    },
+    {
+      "value": "zh",
+      "label": "中文"
+    }
+  ],
+  "fiat": [
+    {
+      "value": "usd",
+      "label": "USD"
+    },
+    {
+      "value": "cny",
+      "label": "CNY"
+    }
+  ],
+
+
+  "relays": [
+
+    {
+      "value": "https://rinkeby.infura.io/GjiCzFxpQAUkPtDUpKEP",
+      "name": "Rinkeby Testnet",
+      "tx":"https://rinkeby.etherscan.io/tx/"
+    }
+
+  ],
+  "supportedTokenRInMarkets":["WETH", "LRC"],
+  "markets": [
+    {
+      "tokenx": "LRC",
+      "tokeny": "WETH",
+      "pricePrecision": 8
+    },
+
+    {
+      "tokenx": "PELO",
+      "tokeny": "WETH",
+      "pricePrecision": 8
+    }
+
+  ],
+  "txs": [
+    {
+      "type":"eth_transfer",
+      "gasLimit":"0x5208"
+    },
+    {
+      "type":"token_transfer",
+      "gasLimit":"0x30d40"
+    },
+    {
+      "type":"approve",
+      "gasLimit":"0x30d40"
+    },
+    {
+      "type":"withdraw",
+      "gasLimit":"0x30d40"
+    },
+    {
+      "type":"deposit",
+      "gasLimit":"0x30d40"
+    }
+
+  ],
+  "tokens": [
+    {
+      "symbol": "ETH",
+      "name": "Ether",
+      "digits": 18,
+      "address": "",
+      "unit": "ETH",
+      "website": "https://ethereum.org",
+      "allowance": "1000000000000000000000",
+      "allowanceWarn": "500000000000000000000",
+      "precision": 6,
+      "minTradeValue": 0.001
+    },
+    {
+      "symbol": "WETH_OLD",
+      "name": "Wrapped Ether",
+      "digits": 18,
+      "address": "0x2956356cD2a2bf3202F771F50D3D14A367b48070",
+      "unit": "WETH",
+      "website": "https://weth.io",
+      "allowance": "1000000000000000000000",
+      "allowanceWarn": "100000000000000000000",
+      "precision": 6,
+      "minTradeValue": 0.001
+    },
+    {
+      "symbol": "WETH",
+      "name": "Wrapped Ether",
+      "digits": 18,
+      "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "unit": "WETH",
+      "website": "https://weth.io",
+      "allowance": "1000000000000000000000",
+      "allowanceWarn": "100000000000000000000",
+      "precision": 6,
+      "minTradeValue": 0.001
+    },
+    {
+      "symbol": "LRC",
+      "name": "Loopring",
+      "digits": 18,
+      "address": "0xEF68e7C694F40c8202821eDF525dE3782458639f",
+      "unit": "LRC",
+      "website": "https://loopring.org",
+      "allowance": "1000000000000000000000",
+      "allowanceWarn": "50000000000000000000",
+      "precision": 6,
+      "minTradeValue": 0.001
+    },
+    {
+      "symbol": "PELO",
+      "name": "pelo",
+      "digits": 18,
+      "address": "0x37ea0939b7f37493003ec823381eaa4f37b1e31e",
+      "unit": "PELO",
+      "website": "https://pelo.io/",
+      "allowance": "1000000000000000000000",
+      "allowanceWarn": "5000000000000000000",
+      "precision": 6,
+      "minTradeValue": 0.001
+    }
+
+  ],
+  "whiteList": [
+    "0x80679a2c82ab82f1e73e14c4bec4ba1992f9f25a",
+    "0x8311804426a24495bd4306daf5f595a443a52e32"
+  ]
+}

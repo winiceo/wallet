@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Mainnet",
+    "value": "mainnet",
+    "tx_explorer": "https://etherscan.io/tx/"
+  },
+  {
+    "id": 3,
+    "name": "Ropsten",
+    "value": "ropsten",
+    "tx_explorer": "https://ropsten.etherscan.io/tx/"
+  },
+  {
+    "id": 4,
+    "name": "Rinkeby",
+    "value": "rinkeby",
+    "tx_explorer": "https://rinkeby.etherscan.io/tx/"
+  },
+  {
+    "id": 42,
+    "name": "Kovan",
+    "value": "kovan",
+    "tx_explorer": "https://kovan.etherscan.io/tx/"
+  }
+]
