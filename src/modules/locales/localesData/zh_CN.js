@@ -759,7 +759,7 @@ export default {
     unlock_by_address: '用您的地址解锁',
     invalid_eth_address: '错误的以太坊地址',
     unlocked_notification_title: '您已成功解锁钱包',
-    unlocked_notification_content: '开始您的路印之旅，希望你能喜欢',
+    unlocked_notification_content: '安全管理您的数字资产',
     unlocked_by: '{type} 钱包',
     type_address: '观察模式',
     type_metamask: 'MetaMask钱包',

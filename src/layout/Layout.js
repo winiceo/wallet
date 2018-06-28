@@ -28,7 +28,7 @@ const MainLayout = (props)=>{
       <Header className="bg-white">
         <Navbar {...props} />
       </Header>
-      <Content className="" style={{background:'#F8F8F8'}}>
+      <Content className="" style={{background:'#F8F8F8',marginBottom:"10px"}}>
         <div className="">
           {children}
         </div>

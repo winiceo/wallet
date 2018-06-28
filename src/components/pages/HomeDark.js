@@ -46,7 +46,7 @@ class  Home extends React.Component {
     };
     return (
       <Layout {...this.props}>
-         <div style={{position:'absolute',width:'100vw',height:'100vh',background:'rgba(0,0,0,0.60)'}} />
+         <div style={{position:'absolute',width:'100vw',height:'100vh',background:'rgba(42, 69, 82, 0.8)'}} />
         <div className="position-absolute text-center d-flex align-items-center justify-content-center" style={{height:'100vh',width:'100%'}}>
           <div className="" style={{letterSpacing:'0.1rem',wordSpacing:'0.2rem'}}>
             <div className="fs40 color-white mb20">{intl.get('home.title')}</div>
