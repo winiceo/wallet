@@ -4,6 +4,8 @@ import TransferPreview from './TransferPreview'
 
 import BatchTransferPreview from './BatchTransferPreview'
 
+import BatchTransferError from './BatchTransferError'
+
 import TransferResult from './TransferResult'
 
 import BatchTransfer from './BatchTransfer'
@@ -84,6 +86,12 @@ function Modals(props){
             <BatchTransferPreview />
           </SettingsContainer>
         </AccountContainer>
+      </ModalContainer>
+
+      <ModalContainer id='token/batchtransfer/error'>
+
+            <BatchTransferError />
+
       </ModalContainer>
 
       <ModalContainer id='token/batchtransfer/result'>

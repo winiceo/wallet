@@ -4,64 +4,38 @@
 //
 //import low from 'lowdb'
 //import LocalStorage from 'lowdb/adapters/LocalStorage'
+const   csvtojson=require( 'csvtojson/v2');
 
-const low=require('lowdb')
-const FileSync = require('lowdb/adapters/FileSync')
+async function main(){
 
-const adapter = new FileSync('db2.json')
-//const db = low(adapter)
+  const csvStr="0x23ACF1f7136DF03e0fCc407a6d5CAFa4fbD5Ea8F,1\n" +
+  "0x23aF24941e7E2C17f835F31Bc113DfAb134fa302,2\n" +
+  "0x23BD179C4ac8128abC9706fb0E61A4b4dEe9D672,3\n" +
+  "0x24896b0180D6a33Fb5205C9cbF72e65A4f762C9f,4\n" +
+  "0x24CA6d19De4763cfA04F244BCC75329F1c416e84,5\n"
 
-// LocalStorage is a lowdb adapter for saving to localStorage
-//const adapter = new LocalStorage('db')
+  const addressAmount=[]
+  const result = await csvtojson({
+    noheader: true,
+    output: "csv"
+  }).fromString(csvStr)
+    .subscribe((csv) => {
+      let el = {};
+      Object.defineProperty(el, csv[0], {
+        value: csv[1],
+        writable: true,
+        configurable: true,
+        enumerable: true,
+      });
+      addressAmount.push(el)
 
-// Create database instance
-const db = low(adapter)
+    })
+    .then((csvRow) => {
+      return addressAmount
+    })
+  console.log(result)
+}
 
-db.defaults({ posts: [] })
-  .write()
-
-const result = db.get('posts')
-  .push({ name: "4444" })
-  .write()
-
-console.log(result)
-
-// // Set default state
-// db.defaults({ items: [] })
-//   .write()
-//
-// function add() {
-//   db.get('items')
-//     .push({ time: Date.now() })
-//     .write()
-// }
-//
-// function reset() {
-//   db.set('items', [])
-//     .write()
-// }
-//
-// //
-// // UI code using vanilla JavaScript
-// // You can use any other UI lib with lowdb
-// //
-//
-// function render() {
-//   const state = db.getState()
-//   const str = JSON.stringify(state, null, 2)
-//   document.getElementById('state').innerHTML = str
-// }
-//
-// document.getElementById('reset').onclick = function() {
-//   reset()
-//   render()
-// }
-//
-// document.getElementById('add').onclick = function() {
-//   add()
-//   render()
-// }
-//
-// render()
+main()
 
 
