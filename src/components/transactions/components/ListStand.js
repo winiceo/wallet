@@ -92,12 +92,7 @@ class ListBlock extends React.Component {
       })
     };
 
-    const gotoBatchTransfer = (symbol) => {
-      showModal({
-        id: 'token/batchtransfer',
-        symbol
-      })
-    };
+
     const gotoConvert = (item) => {
       const originalData = {
         id: 'token/convert',
@@ -122,6 +117,29 @@ class ListBlock extends React.Component {
     const gotoTransfer = () => {
       const originalData = {
         id: 'token/transfer',
+        item: {symbol: token}
+      }
+      const state = window.STORE.getState()
+      if (state && state.account && state.account.walletType === 'Address') {
+        this.props.dispatch({
+          type: 'modals/modalChange',
+          payload: {
+            id: 'wallet/watchOnlyToUnlock',
+            originalData: originalData,
+            pageFrom: '',
+            visible: true
+          }
+        })
+      } else {
+        showModal(originalData)
+      }
+    };
+
+    const gotoBatchTransfer = () => {
+
+
+      const originalData = {
+        id: 'token/batchtransfer',
         item: {symbol: token}
       }
       const state = window.STORE.getState()
@@ -183,12 +201,14 @@ class ListBlock extends React.Component {
     };
 
     const TxItem =  ({item: origin, index}) => {
+      console.log(origin,index)
       let item = {...origin};// fix bug for update item self
+
       item.symbol = item.symbol || 'NO SYMBOL';
       const tokenFm = new uiFormatter.TokenFormatter({symbol: item.symbol});
       const priceToken = prices.getTokenBySymbol(item.symbol);
-      item.guzhi = tokenFm.getAmountValue(origin.value, priceToken.price);
-      item.value = tokenFm.getAmount(origin.value);
+      // item.guzhi = tokenFm.getAmountValue(origin.value, priceToken.price);
+      // item.value = tokenFm.getAmount(origin.value);
       let change;
       let icon;
       let title;
@@ -323,7 +343,7 @@ class ListBlock extends React.Component {
                   item.type !== 'approve' && item.type !== "cancel_order" && item.type !== "cutoff_trading_pair"
                   && item.type !== "cutoff" &&
                   <div className={`fs18 color-${change==='-' ? 'red':'green'}-500 font-weight-bold`}>
-                    {change} {item.value} {item.symbol}
+                    {change}  {item.symbol}
                   </div>
                 }
                 <TxGas item={item} change={change}/>
@@ -373,7 +393,7 @@ class ListBlock extends React.Component {
                 style={{position: "relative", top: '-2px'}}>{intl.get('tokens.options_receive')} {filters.token}</span>
             </Button>
 
-            <Button onClick={gotoBatchTransfer.bind(this, filters.token)} className="mr5" type="default">
+            <Button onClick={gotoBatchTransfer} className="mr5" type="default">
               <i className="icon-loopring icon-loopring-receive fs16 mr5"></i>
               <span
                 style={{position: "relative", top: '-2px'}}>{intl.get('tokens.options_batchtransfer')} {filters.token}</span>
@@ -384,7 +404,7 @@ class ListBlock extends React.Component {
         <div className="pl15 pr15">
           <div className="zb-b-b row pt10 pb10 no-gutters align-items-center">
             <div className="col">
-              <div className="fs2 color-black-1">{intl.get('txs.title')}</div>
+              <div className="fs2 color-black-1">{intl.get('txs.history')}</div>
             </div>
             <div className="col-auto">
               <ListFiltersFormSimple actions={actions} LIST={LIST} style={{marginTop: '-3px'}}/>

@@ -13,6 +13,7 @@ import eachLimit from 'async/eachLimit';
 import {connect} from 'dva';
 import {toBig, toHex, toNumber} from 'Loopring/common/formatter';
 import Web3Utils from 'web3-utils';
+import {getPoaGasPrices} from 'Loopring/ethereum/transaction';
 
 import csvData from "../../../../data.js"
 
@@ -42,11 +43,20 @@ class BatchTransfer extends React.Component {
     demoData: "",
     invalid_addresses: [],
     repeat_addresses: [],
+    flag:false,
+    arrayLimit:200,
+    fee:0.05,
+    poaPrice:"",
+    extraData:{}
   }
+
 
   componentDidMount() {
     const {settings, modal, assets, form} = this.props
+
     const currentToken = modal.item
+
+    console.log("currentToken",currentToken)
     let GasLimit = config.getGasLimitByType('eth_transfer').gasLimit
     if (currentToken && currentToken.symbol !== "ETH") {
       GasLimit = config.getGasLimitByType('token_transfer').gasLimit
@@ -56,6 +66,9 @@ class BatchTransfer extends React.Component {
       selectedGasPrice: settings.trading.gasPrice,
       selectedGasLimit: fm.toNumber(GasLimit)
     })
+
+
+
     getGasPrice().then(res => {
       if (res.result) {
         const gasPrice = fm.toBig(res.result).div(1e9).toNumber()
@@ -71,6 +84,8 @@ class BatchTransfer extends React.Component {
         }
       }
     })
+
+
     if (modal.item) {
       this.setState({tokenSymbol: currentToken.symbol})
     } else {
@@ -134,11 +149,20 @@ class BatchTransfer extends React.Component {
     })
     assetsSorted.sort(sorter);
 
-    async function handleSubmit() {
-      console.log("handleSubmit")
-      console.log(this)
-      //
+   const  getPoaPrice1=async()=>{
+      let price=await  getPoaGasPrices();
+      console.log(price)
+       _this.setState({poaPrice:fm.toHex(fm.toNumber(price.fast) * 1e9)});
 
+    }
+
+    async function handleSubmit() {
+       //await getPoaPrice1();
+      const tokenConfig = window.CONFIG.getTokenBySymbol(currentToken.symbol)
+
+
+      _this.setState({invalid_addresses:[]})
+      _this.setState({repeat_addresses:[]})
       form.validateFields(async (err, values) => {
         if (!err) {
           const tx = {};
@@ -173,9 +197,12 @@ class BatchTransfer extends React.Component {
             tx.data = fm.toHex(values.data);
           } else {
 
+            const token = getToken(currentToken.symbol);
+
+            console.log(token)
             tx.value = "0x0";
 
-            let AddressAmount = await window.STORAGE.transactions.csvStrToJson(values.addressAmount)
+            let AddressAmount = await window.STORAGE.transactions.csvStrToJson(_this.state.demoData)
 
 
             let sendsData = new Map();
@@ -196,19 +223,21 @@ class BatchTransfer extends React.Component {
 
             })
 
-            sendsData.slice().forEach((account) => {
-              addresses_to_send.push(Object.keys(account)[0]);
-              balances_to_send.push(fm.toHex(fm.toBig(Object.values(account)[0]).times("1e" + 18)))
-              totalBalance = new BN(Object.values(account)[0]).plus(totalBalance).toString(10);
+             sendsData.forEach((balance,account) => {
+              addresses_to_send.push(account);
+              balances_to_send.push(fm.toHex(fm.toBig(balance).times("1e" + 18)))
+
+              totalBalance = new BN(balance).plus(totalBalance).toString(10);
+
             })
 
 
-            tx.data = generateAbiData({
-              method: "multisendToken",
-              tokenA: "0x37ea0939b7f37493003ec823381eaa4f37b1e31e",
-              address: to,
-              amount: amount
-            });
+            // tx.data = generateAbiData({
+            //   method: "multisendToken",
+            //   tokenA: token.address,
+            //   address: to,
+            //   amount: amount
+            // });
 
 
           }
@@ -221,12 +250,25 @@ class BatchTransfer extends React.Component {
             totalBalance: totalBalance,
             invalid_addresses:_this.state.invalid_addresses,
             repeat_addresses:_this.state.repeat_addresses,
+            arrayLimit:_this.state.arrayLimit,
+            fee:_this.state.fee,
+            balance:1000,
+            eth_balance:100,
+            count:addresses_to_send.length,
+            approve:100,
+            totalNumberTx:Math.ceil(addresses_to_send/_this.state.arrayLimit)
           }
+          _this.setState({extraData:extraData})
+
+          extraData.totalCostInEth=11;//await totalCostInEth();
+
+
           if(_this.state.invalid_addresses.length>0||_this.state.repeat_addresses.length>0){
             modal.showModal({id: 'token/batchtransfer/error', tx, extraData})
 
           }else{
             modal.showModal({id: 'token/batchtransfer/preview', tx, extraData})
+            modal.hideModal({id: 'token/batchtransfer'});
 
           }
 
@@ -240,6 +282,23 @@ class BatchTransfer extends React.Component {
 
     function handleReset() {
       form.resetFields()
+    }
+
+    function totalCostInEth(){
+
+      const standardGasPrice = _this.state.poaPrice;//Web3Utils.toWei(this.gasPriceStore.gasPrices.fast.toString(), 'gwei');
+      console.log(standardGasPrice)
+      const currentFeeInWei ='50000';// Web3Utils.toWei(toBig(_this.state.fee));
+      const tx = new BN(standardGasPrice).times(new BN('6000000'))
+      const txFeeMiners = tx.times(new BN(_this.state.extraData.totalNumberTx))
+      const contractFee = new BN(currentFeeInWei).times(_this.state.extraData.totalNumberTx);
+
+      console.log("==============")
+
+      console.log(txFeeMiners.toString())
+
+      console.log(contractFee.toString())
+      return Web3Utils.fromWei(txFeeMiners.plus(contractFee).toString(10))
     }
 
     function resetForm() {
@@ -369,6 +428,7 @@ class BatchTransfer extends React.Component {
       this.setState({demoData: csvData})
     }
 
+
     function clearDemo() {
       this.setState({demoData: ""})
     }
@@ -390,6 +450,12 @@ class BatchTransfer extends React.Component {
         }
         this.setState({selectedGasLimit: gasLimit})
       }
+    }
+
+
+
+    function textareaChange(e) {
+      this.setState({demoData: e.target.value});
     }
 
     function gasPriceChange(e) {
@@ -546,7 +612,7 @@ class BatchTransfer extends React.Component {
     return (
       <Card title={`${intl.get('tokens.options_batchtransfer')} ${this.state.tokenSymbol}`}>
         <Form layout="horizontal">
-          {_this.state.invalid_addresses.length > 0 &&
+          {this.state.flag&&_this.state.invalid_addresses.length > 0 &&
           <div className="row mt5">
             <div className="col">地址错误:<Alert message={_this.state.invalid_addresses} type="error"/>
             </div>
@@ -555,7 +621,7 @@ class BatchTransfer extends React.Component {
             </div>
           </div>
           }
-          {_this.state.repeat_addresses.length > 0 &&
+          {this.state.flag&&_this.state.repeat_addresses.length > 0 &&
           <div className="row mt5">
             <div className="col">地址重复:<Alert message={_this.state.repeat_addresses} type="error"/>
             </div>
@@ -590,7 +656,7 @@ class BatchTransfer extends React.Component {
           <Form.Item className="pt0 pb0" label={null} {...tailFormItemLayout} colon={false}>
 
             <Input.TextArea autosize={{minRows: 12, maxRows: 12}} value={this.state.demoData} size="large"
-                            className='d-block fs12' onKeyDown={toContinue.bind(this)}/>
+                            className='d-block fs12' onKeyDown={toContinue.bind(this)}  onChange={textareaChange.bind(this)}/>
 
 
           </Form.Item>

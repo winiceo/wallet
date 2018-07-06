@@ -35,6 +35,8 @@ class Transfer extends React.Component {
   componentDidMount() {
     const {settings, modal, assets, form} = this.props
     const currentToken = modal.item
+    console.log(this.props)
+    console.log("current",currentToken)
     let GasLimit = config.getGasLimitByType('eth_transfer').gasLimit
     if(currentToken && currentToken.symbol !== "ETH") {
       GasLimit = config.getGasLimitByType('token_transfer').gasLimit

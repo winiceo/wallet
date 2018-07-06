@@ -20,11 +20,11 @@ class BatchTransferError extends React.Component {
     const {tx, extraData} = modal
     let content=""
     if(extraData.invalid_addresses){
-      content="以下地址有错:\n"+
+      content+="<font color='white'>以下地址有错:</font>\n"+
         extraData.invalid_addresses.join("\n");
     }
     if(extraData.repeat_addresses){
-      content="以下地址有重复:\n"+
+      content+="<br><br><font color='white'>以下地址有重复:</font>\n"+
         extraData.repeat_addresses.join("\n");
     }
 
@@ -41,9 +41,10 @@ class BatchTransferError extends React.Component {
     return (
       <div className="text-left">
         <Alert
-          type="info"
+          type="error"
+
           title={intl.get('wallet.using_watch_only_mode_title')}
-           description={content}
+          description={content}
           actions={
             <div>
               <Button className="alert-btn mr5" size="large" onClick={cancel} >{intl.get('tokens.cancel')}</Button>

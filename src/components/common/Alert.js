@@ -1,12 +1,12 @@
 import React, { PropTypes } from 'react';
 import {Button,Icon} from 'antd';
 
-const Alert = ({title,description,type='info',theme='dark',actions,size="medium",className="",...rest})=>{
+const Alert = ({title,description,type='info',showicon=true,theme='dark',actions,size="medium",className="",...rest})=>{
   return (
     <div className={`loopring-alert t-${type} t-${theme} s-${size} ${className}`} {...rest}>
       <div className="row align-items-center">
         {
-          type &&
+          showicon&&type &&
           <div className="col-auto alert-gutter">
             {
               type === 'success' &&
@@ -33,7 +33,7 @@ const Alert = ({title,description,type='info',theme='dark',actions,size="medium"
           <div className="alert-title">{title}</div>
           {
             description &&
-            <div className="alert-description">{description}</div>
+            <div className="alert-description" dangerouslySetInnerHTML={{__html:description}}></div>
           }
           {
             actions &&

@@ -322,6 +322,7 @@ export default {
   },
   txs: {
     title: '交易',
+    history: '交易历史(本地)',
     status: '状态',
     status_pending: '处理中',
     status_success: '成功',
@@ -567,6 +568,20 @@ export default {
     from: "发送方",
     to: "发送到",
     gas: "油费",
+    batch_info:{
+
+      base:'发送信息',
+      account:'账户余额',
+      order:'交易信息',
+      balance_send:'合计数量',
+      balance:'当前账户余额',
+      count:'发送地址数数',
+      approve:'授权数量',
+      totalNumberTx:'笔数',
+      one:'单笔成本',
+      eth_balance:'Eth余额',
+      estimate:'预估消耗'
+    },
     transfer_cancel: "不，取消发送",
     transfer_send: "是的，马上发送",
     to_confirm_title: "等待您的确认",

@@ -23,20 +23,18 @@ const multiplier = function (dig) {
   const decimals = Number(dig)
   return new BN(10).pow(decimals)
 }
+const txHash="0x0"
 
 
 let BatchPreview = ({
                       modal, account, modals, tradingConfig,dispatch
                     }) => {
   const {tx, extraData} = modal
-  // const {  dispatch } = this.props;
-  //
-    console.log(dispatch)
-
 
   function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
 
   async function getReceipt(hash) {
     await timeout(3000);
@@ -50,66 +48,88 @@ let BatchPreview = ({
 
   }
 
-  const storeStx = function (txs) {
-    let batchTxs = localStorage.batchTxs;//config.tokens || []
-    if (batchTxs) {
-      batchTxs = JSON.parse(batchTxs)
-      //console.log(batchTxs)
-    } else {
-      batchTxs = []
+
+  const storeTxData = ({tx,type}) => {
+
+
+    const data={
+      type,
+      hash:txHash,
+      owner: window.WALLET.getAddress(),
+      tx,
+      "createTime": 1529758250,
+      symbol:extraData.tokenSymbol,
+      status:'pre',
+      gas_price: "10000000000",
+      gas_limit: "100000",
+      gas_used: "36787",
     }
-    batchTxs.push(txs)
-    localStorage.batchTxs = JSON.stringify(batchTxs)
+    console.log(data)
+    window.STORAGE.transactions.addTx(data);
 
+    updateTransations(extraData.tokenSymbol)
 
-  }
-  const updateTransations = (tx) => {
+  };
+
+  const updateTransations = (token) => {
+    console.log(token)
     dispatch({
-      type: 'transactions/txsChange',
+      type: 'transactions/filtersChange',
       payload: {
-        tx:tx
+        filters: {token}
       }
     })
   }
+
+
   async function batchSends(stx, callback) {
 
-    let nonce = await window.STORAGE.wallet.getNonce(window.WALLET.getAddress()) || 0;
-    stx.nonce = fm.toHex(nonce)
-    const {response, rawTx} = await window.WALLET.batchSendTransaction(stx);
-    if (response.error) {
-      console.log(response.error.message)
-      callback(response.error.message)
-    } else {
-      console.log('response.result')
-      console.log(response.result)
-      window.STORAGE.transactions.addTx({hash: response.result, owner: window.WALLET.getAddress()});
-      const order={
-        "owner": window.WALLET.getAddress(),
-        "from": window.WALLET.getAddress(),
-        "to": configs['batchAddress'],
-        "txHash": response.result,
-        "symbol": "LRC",
-        "content": {
-          "market": "",
-          "orderHash": "",
-          "fill": ""
-        },
-        "blockNumber": 5840165,
-        "value": "5000000000000000000",
-        "logIndex": 5,
-        "type": "send",
-        "status": "success",
-        "createTime": 1529758250,
-        "updateTime": 1529758250,
-        "gas_price": "10000000000",
-        "gas_limit": "100000",
-        "gas_used": "36787",
-        "nonce": "1959"
-      }
-      updateTransations(order)
-      console.log(rawTx)
-      callback()
+    console.log("sssss",stx)
+    console.log(stx.type)
+    switch (stx.type){
+      case "approve":
+        alert(3)
+        let rawtx=await window.WALLET.sendTransaction(stx.tx)
+        console.log(rawTx)
+        let recit = await getReceipt(rawtx.response.result)
+        console.log(recit)
+        if (recit) {
+          callback();
+        }
+        break;
+      case "batch":
+        let nonce = await window.STORAGE.wallet.getNonce(window.WALLET.getAddress()) || 0;
+        stx.nonce = fm.toHex(nonce)
+        const {response, rawTx}=await window.WALLET.batchSendTransaction(stx.tx);
+        if (response.error) {
+          console.log(response.error.message)
+          callback(response.error.message)
+        } else {
+          callback()
+        }
+        break;
     }
+    // let res={}
+    // console.log("stx",stx)
+    // if(stx.type=="approve"){
+    //   res=await window.WALLET.sendTransaction(stx.tx)
+    // }else if(stx.type=="batch"){
+    //   let nonce = await window.STORAGE.wallet.getNonce(window.WALLET.getAddress()) || 0;
+    //   stx.nonce = fm.toHex(nonce)
+    //   res=await window.WALLET.batchSendTransaction(stx.tx);
+    //
+    // }
+    // const {response, rawTx}=res;
+    //
+    // console.log(res)
+    // console.log(response, rawTx)
+    // let nonce = await window.STORAGE.wallet.getNonce(window.WALLET.getAddress()) || 0;
+    // stx.nonce = fm.toHex(nonce)
+    //
+    // const {response, rawTx} = await window.WALLET.batchSendTransaction(stx);
+
+
+
   }
 
 
@@ -159,15 +179,22 @@ let BatchPreview = ({
         gasLimit,
         nonce: toHex(nonce),
       }));
-      let rawtx = await window.WALLET.sendTransaction(approveTx)
+      // storeTxData({type:'approve',hash:txHash,tx:approveTx})
+      //
+      // let rawtx = await window.WALLET.sendTransaction(approveTx)
+      // //await _batchSend(tx, extraData)
+      //
+      // let recit = await getReceipt(rawtx.response.result)
+      // if (recit) {
+      //   await _batchSend(tx, extraData)
+      //   const order={}
+      //
+      // } else {
+      //   console.log('approve error')
+      // }
 
-      let recit = await getReceipt(rawtx.response.result)
-      if (recit) {
-        await _batchSend(tx, extraData)
-      } else {
-        console.log('approve error')
-      }
-
+      storeTxData({tx:approveTx,type:'approve'})
+      await _batchSend(tx, extraData)
     } else {
       //console.log('ggggg')
       await _batchSend(tx, extraData)
@@ -204,10 +231,13 @@ let BatchPreview = ({
       });
 
       sendTxs.push(sendTx)
+      storeTxData({type:'batch',sendTx})
+
     }
+    const allTxs = localStorage.txs ? JSON.parse(localStorage.txs) : [];
 
 
-    eachLimit(sendTxs, 1, batchSends, function (error) {
+    eachLimit(allTxs, 1, batchSends, function (error) {
 
       if (error) {
         console.log(error)
@@ -216,6 +246,8 @@ let BatchPreview = ({
       }
 
     });
+
+    modal.hideModal({id: 'token/batchtransfer/preview'});
 
 
   }
@@ -248,20 +280,48 @@ let BatchPreview = ({
         <div className="col">
           <div className="text-center">
             <CoinIcon size="60" symbol={extraData.tokenSymbol}/>
-            <div className="fs20 color-black font-weight-bold">
-              genv{`${ (extraData.amount)} ${extraData.tokenSymbol} `}</div>
-            <div className="fs14 color-black-3">{priceValue}</div>
           </div>
         </div>
       </div>
-      <MetaItem label={intl.get('token.from')} value={extraData.from}/>
-      <MetaItem label={intl.get('token.to')} value={extraData.to}/>
-      <MetaItem label={intl.get('token.gas')} value={
+
+      <MetaItem label={intl.get('token.batch_info.base')} value={
         <div className="mr15">
           <div className="row justify-content-end">
-            gggg{`${fm.toBig(tx.gasPrice.toString()).times(tx.gasLimit).times('1e-18').toString(10)}  ETH`}</div>
-          <div
-            className="row justify-content-end fs14 color-black-3">{`Gas(${fm.toNumber(tx.gasLimit).toString(10)}) * Gas Price(${fm.toNumber(tx.gasPrice) / (1e9).toString(10)} Gwei)`}</div>
+            {intl.get('token.batch_info.balance_send')}{`${extraData.totalBalance}  PELO`}</div>
+          <div className="row justify-content-end fs14 color-black-3">
+            {intl.get('token.batch_info.count')}(${extraData.count})
+            </div>
+        </div>
+      }/>
+
+      <MetaItem label={intl.get('token.batch_info.account')} value={
+        <div className="mr15">
+          <div className="row justify-content-end">
+            {intl.get('token.batch_info.balance')}{`${extraData.balance}  PELO`}</div>
+          <div className="row justify-content-end fs14 color-black-3">
+            {intl.get('token.batch_info.approve')}(${extraData.approve})
+            </div>
+        </div>
+      }/>
+
+
+
+      <MetaItem label={intl.get('token.batch_info.order')} value={
+        <div className="mr15">
+          <div className="row justify-content-end">
+            {intl.get('token.batch_info.one')}:{`${extraData.fee}  PELO`}</div>
+          <div className="row justify-content-end fs14 color-black-3">
+            {intl.get('token.transfer_count.totalNumberTx')}:{extraData.totalNumberTx}
+            </div>
+        </div>
+      }/>
+      <MetaItem label={intl.get('token.batch_info.eth_balance')} value={
+        <div className="mr15">
+          <div className="row justify-content-end">
+            {intl.get('token.batch_info.eth_balance')}:{`${extraData.eth_balance}  PELO`}</div>
+          <div className="row justify-content-end fs14 color-black-3">
+            {intl.get('token.batch_info.estimate')}:{extraData.totalCostInEth}
+            </div>
         </div>
       }/>
       <div className="row pt30 pb10">
@@ -270,7 +330,7 @@ let BatchPreview = ({
                   size="large">{intl.get('token.transfer_cancel')}</Button>
         </div>
         <div className="col pr15">
-          <Button loading={modal.loading} onClick={handelSubmit} className="d-block w-100" type="primary"
+          <Button   onClick={handelSubmit} className="d-block w-100" type="primary"
                   size="large">{intl.get('token.transfer_send')}</Button>
         </div>
       </div>

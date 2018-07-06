@@ -1,12 +1,12 @@
 import {getTransactionByhash} from "Loopring/ethereum/utils";
 import validator from 'Loopring/ethereum/validator';
 import filter from 'async/filter';
-import  csvtojson from 'csvtojson/v2';
+import csvtojson from 'csvtojson/v2';
 
 const addTx = (tx) => {
   const txs = localStorage.txs ? JSON.parse(localStorage.txs) : [];
   try {
-    validator.validate({value: tx.hash, type: "ETH_DATA"});
+   // validator.validate({value: tx.hash, type: "ETH_DATA"});
     validator.validate({value: tx.owner, type: "ADDRESS"});
     txs.push(tx);
     localStorage.txs = JSON.stringify(txs);
@@ -25,11 +25,11 @@ const updateTx = async () => {
   });
 };
 
-const getTxs = (owner) => {
+const getTxs = (owner, symbol) => {
   const txs = localStorage.txs ? JSON.parse(localStorage.txs) : [];
   if (owner) {
     return txs.filter((tx) => {
-      return !!tx.owner && tx.owner === owner
+      return !!tx.owner && (tx.owner === owner) && (tx.symbol === symbol)
     })
   } else {
     return txs
@@ -38,7 +38,7 @@ const getTxs = (owner) => {
 
 
 //转化成json
-const   csvStrToJson=async (csvStr)=> {
+const csvStrToJson = async (csvStr) => {
   let addressAmount = [];
 
   const result = await csvtojson({

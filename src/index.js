@@ -43,16 +43,16 @@ let models  = [
   require('./modules/modals/model').default,
   require('./modules/locales/model').default,
   require('./modules/networks/model').default,
-  require('./modules/rings/models/list').default,
-  require('./modules/trades/models/list').default,
-  require('./modules/orders/models/list').default,
-  require('./modules/orders/models/PlaceOrderModel').default,
+  //require('./modules/rings/models/list').default,
+  //require('./modules/trades/models/list').default,
+  //require('./modules/orders/models/list').default,
+  //require('./modules/orders/models/PlaceOrderModel').default,
   require('./modules/tokens/models/ListModel').default,
   require('./modules/tokens/models/EthTxModel').default,
   require('./modules/transactions/models/list').default,
   require('./modules/settings/model').default,
   require('./modules/account/model').default,
-  require('./modules/tickers/ListModel').default,
+  //require('./modules/tickers/ListModel').default,
 ]
 models.map(model=>{
   app.model(model)
